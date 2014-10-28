@@ -120,6 +120,8 @@ sales_all_scotland <- ddply(
   house_tenant_sales=sum(HO.Housetenantsale)
   )
 
+sales_all_scotland$area <- "scotland"
+
 qplot(x=year, y=all_tenant_sales, data=sales_all_scotland, geom="line")
 # Now just for east end of glasgow
 
@@ -137,6 +139,7 @@ sales_east_end_combined <- ddply(
   house_tenant_sales=sum(HO.Housetenantsale)
 )
 
+sales_east_end_combined$area <- "east_end"
 qplot(x=year, y=all_tenant_sales, data=sales_east_end_combined, geom="line")
 
 ######################
@@ -155,7 +158,17 @@ sales_west_end_combined <- ddply(
   house_tenant_sales=sum(HO.Housetenantsale)
 )
 
+sales_west_end_combined$area <- "west_end"
+
 qplot(x=year, y=all_tenant_sales, data=sales_west_end_combined, geom="line")
+
+
+# council house sales 
+council_house_sales_combined <- rbind(
+  sales_all_scotland,
+  sales_east_end_combined,
+  sales_west_end_combined
+  )
 
 
 #### How about house price sales?
@@ -192,7 +205,7 @@ house_prices_all <- ldply(
 
 # Council house sales for all of scotland
 
-house_price_all_scotland <- ddply(
+house_prices_all_scotland <- ddply(
   house_prices_all,
   .(year),
   summarise,
@@ -202,6 +215,8 @@ house_price_all_scotland <- ddply(
   house_price_upper_quartile = median(HO.hpriceuquartile),
   number_of_house_sales = sum(HO.hsalesno)
 )
+house_prices_all_scotland$area <- "scotland"
+
 
 qplot(x=year, y=number_of_house_sales, data=house_price_all_scotland, geom="line")
 # Now just for east end of glasgow
@@ -222,6 +237,9 @@ house_prices_all_east_end <- ddply(
   number_of_house_sales = sum(HO.hsalesno)
 )
 
+house_prices_all_east_end$area <- "east_end"
+
+
 qplot(x=year, y=number_of_house_sales, data=house_prices_all_east_end, geom="line")
 
 #####
@@ -241,13 +259,19 @@ house_prices_all_west_end <- ddply(
   number_of_house_sales = sum(HO.hsalesno)
 )
 
+house_prices_all_west_end$area <- "west_end"
+
 qplot(x=year, y=number_of_house_sales, data=house_prices_all_west_end, geom="line")
 
 qplot(x=year, y=house_price_median, data=house_prices_all_west_end, geom="line")
 
 qplot(x=year, y=house_price_median, data=house_prices_all_east_end, geom="line")
 
-
+house_prices_combined <- rbind(
+  house_prices_all_scotland,
+  house_prices_all_east_end,
+  house_prices_all_west_end
+)
 
 
 # Now JSA
@@ -313,6 +337,8 @@ jsa_scotland <- ddply(
   jsa_claimants_total = sum(CS.JSA_total)
   )
 
+jsa_scotland$area <- "scotland"
+
 
 jsa_east_end <- subset(
   jsa_all,
@@ -331,6 +357,7 @@ jsa_all_east_end <- ddply(
   jsa_claimants_total = sum(CS.JSA_total)
 )
 
+jsa_all_east_end$area <- "east_end"
 
 #####
 jsa_west_end <- subset(
@@ -350,8 +377,33 @@ jsa_all_west_end <- ddply(
   jsa_claimants_total = sum(CS.JSA_total)
 )
 
+jsa_all_west_end$area <- "west_end"
 
 ###########
+
+# Combine all into a single dataset
+
+jsa_combined <- rbind(
+  jsa_scotland,
+  jsa_all_east_end,
+  jsa_all_west_end
+  )
+
+
+
+# join all to a single dataset
+
+all_simplified_data <- join(
+  council_house_sales_combined,
+  house_prices_combined  
+  )
+
+all_simplified_data <- join(
+  all_simplified_data,
+  jsa_combined
+  )
+
+write.csv(all_simplified_data, "all_simplified_data.csv")
 
 
 
