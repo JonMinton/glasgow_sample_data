@@ -74,9 +74,9 @@ west_end_dzs  <- c(
 # Look at data from Konrad
 
 # Tables of interest
-House sales and prices 2001
-
-House sales and prices 2010
+# House sales and prices 2001
+# 
+# House sales and prices 2010
 
 
 
@@ -325,6 +325,8 @@ jsa_all <- ddply(
   fn
 )
 
+
+write.csv(jsa_all, "jsa_merged.csv")
 jsa_scotland <- ddply(
   jsa_all,
   .(year),
